@@ -88,9 +88,9 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
 
     private int mScreenWidth;
     private int mTenDp;
-    private int mSixDp;
-    private int mSixteenDp;
-    private int mEightDp;
+    private int mIconPaddingSelected;
+    private int mIconPaddingShifting;
+    private int mIconPadding;
     private int mMaxFixedItemWidth;
     private int mMaxInActiveShiftingItemWidth;
     private int mInActiveShiftingItemWidth;
@@ -920,9 +920,9 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
 
         mScreenWidth = MiscUtils.getScreenWidth(mContext);
         mTenDp = MiscUtils.dpToPixel(mContext, 10);
-        mSixteenDp = MiscUtils.dpToPixel(mContext, 16);
-        mSixDp = MiscUtils.dpToPixel(mContext, 6);
-        mEightDp = MiscUtils.dpToPixel(mContext, 8);
+        mIconPaddingShifting = MiscUtils.dpToPixel(mContext, 16);
+        mIconPaddingSelected = MiscUtils.dpToPixel(mContext, 0);
+        mIconPadding = MiscUtils.dpToPixel(mContext, 0);
         mMaxFixedItemWidth = MiscUtils.dpToPixel(mContext, 168);
         mMaxInActiveShiftingItemWidth = MiscUtils.dpToPixel(mContext, 96);
     }
@@ -1067,8 +1067,8 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
         if (v.getTag().equals(TAG_BOTTOM_BAR_VIEW_INACTIVE)) {
             View oldTab = findViewWithTag(TAG_BOTTOM_BAR_VIEW_ACTIVE);
 
-            unselectTab(oldTab, true);
-            selectTab(v, true);
+            unselectTab(oldTab, false);
+            selectTab(v, false);
 
             shiftingMagic(oldTab, v, true);
         }
@@ -1355,7 +1355,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         if (changed) {
-            updateTitleBottomPadding();
+            //updateTitleBottomPadding();
         }
     }
 
@@ -1395,6 +1395,11 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
         tab.setTag(TAG_BOTTOM_BAR_VIEW_ACTIVE);
         ImageView icon = (ImageView) tab.findViewById(R.id.bb_bottom_bar_icon);
         TextView title = (TextView) tab.findViewById(R.id.bb_bottom_bar_title);
+        View selectedIndicator = tab.findViewById(R.id.bb_tab_selected_indicator);
+
+        if (selectedIndicator != null) {
+            selectedIndicator.setVisibility(VISIBLE);
+        }
 
         int tabPosition = findItemPosition(tab);
 
@@ -1434,7 +1439,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
 
             // We only want to animate the icon to avoid moving the title
             // Shifting or fixed the padding above icon is always 6dp
-            MiscUtils.resizePaddingTop(icon, icon.getPaddingTop(), mSixDp, ANIMATION_DURATION);
+            MiscUtils.resizePaddingTop(icon, icon.getPaddingTop(), mIconPaddingSelected, ANIMATION_DURATION);
 
             if (mIsShiftingMode) {
                 ViewCompat.animate(icon)
@@ -1447,7 +1452,7 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
         } else {
             ViewCompat.setScaleX(title, 1);
             ViewCompat.setScaleY(title, 1);
-            icon.setPadding(icon.getPaddingLeft(), mSixDp, icon.getPaddingRight(),
+            icon.setPadding(icon.getPaddingLeft(), mIconPaddingSelected, icon.getPaddingRight(),
                 icon.getPaddingBottom());
 
             if (mIsShiftingMode) {
@@ -1462,6 +1467,11 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
 
         ImageView icon = (ImageView) tab.findViewById(R.id.bb_bottom_bar_icon);
         TextView title = (TextView) tab.findViewById(R.id.bb_bottom_bar_title);
+        View selectedIndicator = tab.findViewById(R.id.bb_tab_selected_indicator);
+
+        if (selectedIndicator != null) {
+            selectedIndicator.setVisibility(INVISIBLE);
+        }
 
         if (!mIsShiftingMode || mIsTabletMode) {
             int inActiveColor = mIsDarkTheme ? mWhiteColor : mInActiveColor;
@@ -1484,8 +1494,8 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
             return;
         }
 
-        float scale = mIsShiftingMode ? 0 : 0.86f;
-        int iconPaddingTop = mIsShiftingMode ? mSixteenDp : mEightDp;
+        float scale = mIsShiftingMode ? 0 : 1;
+        int iconPaddingTop = mIsShiftingMode ? mIconPaddingShifting : mIconPadding;
 
         if (animate) {
             ViewPropertyAnimatorCompat titleAnimator = ViewCompat.animate(title)
