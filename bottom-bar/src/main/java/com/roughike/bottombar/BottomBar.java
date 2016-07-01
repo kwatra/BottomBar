@@ -461,6 +461,18 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
         return mCurrentTabPosition;
     }
 
+    public View getTabAtPosition(int position) {
+        if (mItems == null || mItems.length == 0) {
+            throw new UnsupportedOperationException("Can't get tab at " +
+                    "position " + position + ". This BottomBar has no items set yet.");
+        } else if (position > mItems.length - 1 || position < 0) {
+            throw new IndexOutOfBoundsException("Can't get tab at position " +
+                    position + ". This BottomBar has no items at that position.");
+        }
+
+        return mItemContainer.getChildAt(position);
+    }
+
     /**
      * Hide the BottomBar.
      */
