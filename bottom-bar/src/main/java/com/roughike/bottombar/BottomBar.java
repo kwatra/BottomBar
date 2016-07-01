@@ -966,8 +966,11 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
                         ViewGroup.LayoutParams.MATCH_PARENT);
             }
 
-            if (mIsTabletMode && mIsShy) {
-                ((ViewGroup) mPendingUserContentView.getParent()).removeView(mPendingUserContentView);
+            if (mIsTabletMode) {
+                ViewGroup parent = (ViewGroup) mPendingUserContentView.getParent();
+                if (parent != null) {
+                    parent.removeView(mPendingUserContentView);
+                }
             }
 
             mUserContentContainer.addView(mPendingUserContentView, 0, params);
