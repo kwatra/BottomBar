@@ -214,19 +214,24 @@ public class BottomBar extends RelativeLayout implements View.OnClickListener, V
      */
     public static BottomBar attachShy(CoordinatorLayout coordinatorLayout, View userContentView, Bundle savedInstanceState) {
         return attachWithCoordinatorLayout(
-                coordinatorLayout, userContentView, savedInstanceState, true  /*isShy*/);
+                coordinatorLayout, userContentView, savedInstanceState,
+                true,  //isShy
+                false  //ignoreTabletLayout
+        );
     }
 
     public static BottomBar attachWithCoordinatorLayout(
             CoordinatorLayout coordinatorLayout, View userContentView, Bundle savedInstanceState,
-            boolean isShy) {
+            boolean isShy, boolean ignoreTabletLayout) {
         final BottomBar bottomBar = new BottomBar(coordinatorLayout.getContext());
         bottomBar.onRestoreInstanceState(savedInstanceState);
         if (isShy) {
             bottomBar.toughChildHood(ViewCompat.getFitsSystemWindows(coordinatorLayout));
         }
 
-        if (userContentView != null && coordinatorLayout.getContext()
+        if (ignoreTabletLayout) {
+            bottomBar.noTabletGoodness();
+        } else if (userContentView != null && coordinatorLayout.getContext()
                 .getResources().getBoolean(R.bool.bb_bottom_bar_is_tablet_mode)) {
             bottomBar.setPendingUserContentView(userContentView);
         }
